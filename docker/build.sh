@@ -3,8 +3,11 @@
 # 删除当前目录下的 stock 目录
 rm -rf stock
 
+stock_path=$(realpath $(dirname "$(realpath "$0")")/..)
+
 # 使用 rsync 从上级目录复制 stock 目录到当前目录，排除指定的文件和目录
-rsync -av --progress ../../stock . \
+cd $stock_path/docker
+rsync -av --progress $stock_path . \
     --exclude .git \
     --exclude .idea \
     --exclude *.md \
@@ -19,10 +22,10 @@ rsync -av --progress ../../stock . \
     --exclude instock/test
 
 # 定义 Docker 镜像名称
-DOCKER_NAME=ykli/instock
+DOCKER_NAME=ykli109/instock
 
 # 获取当前日期并格式化为 YYYYMM，用于版本标签
-TAG1=$(date "+%Y%m")
+TAG1=$(date "+%Y%m%d%H%M")
 
 # 定义最新版本标签
 TAG2=latest
@@ -30,7 +33,7 @@ TAG2=latest
 # 输出构建 Docker 镜像的命令
 echo " docker build -f Dockerfile -t ${DOCKER_NAME} ."
 
-# # 构建 Docker 镜像，使用 Dockerfile，并打上两个标签
+# 构建 Docker 镜像，使用 Dockerfile，并打上两个标签
 docker build -f Dockerfile -t ${DOCKER_NAME}:${TAG1} -t ${DOCKER_NAME}:${TAG2} .
 
 # 输出分隔线

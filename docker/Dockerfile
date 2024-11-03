@@ -2,7 +2,7 @@
 FROM docker.io/python:3.13-slim-bullseye
 
 # 维护者信息
-MAINTAINER myh 
+MAINTAINER ykli109
 # 设置语言环境为中文
 ENV LANG=zh_CN.UTF-8 
 # 设置字符类型为中文
@@ -26,4 +26,4 @@ RUN chmod +x /tmp/install.sh && /tmp/install.sh && \
     rm -f /tmp/install.sh
 
 # 设置容器启动时执行的命令
-ENTRYPOINT ["supervisord","-n","-c","/data/InStock/supervisor/supervisord.conf"]
+# ENTRYPOINT ["supervisord","-n","-c","/data/InStock/supervisor/supervisord.conf"]

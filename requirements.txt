@@ -34,7 +34,6 @@ requests==2.32.3
 six==1.16.0
 soupsieve==2.6
 SQLAlchemy==2.0.35
-TA-Lib==0.4.32
 tornado==6.4.1
 tqdm==4.66.5
 types-python-dateutil==2.9.0.20241003

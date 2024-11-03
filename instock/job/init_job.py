@@ -12,7 +12,7 @@ cpath = os.path.abspath(os.path.join(cpath_current, os.pardir))
 sys.path.append(cpath)
 import instock.lib.database as mdb
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 

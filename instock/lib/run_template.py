@@ -9,7 +9,7 @@ import sys
 import time
 import instock.lib.trade_time as trd
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 

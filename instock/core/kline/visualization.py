@@ -17,7 +17,7 @@ import instock.core.indicator.calculate_indicator as idr
 import instock.core.pattern.pattern_recognitions as kpr
 import instock.core.kline.indicator_web_dic as iwd
 
-__author__ = 'myh '
+
 __date__ = '2023/4/6 '
 
 

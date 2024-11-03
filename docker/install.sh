@@ -25,8 +25,6 @@ apt-get install -y cron gcc make python3-dev default-libmysqlclient-dev build-es
 
 # 安装Python包
 pip install -r /path/to/requirements.txt
-pip install supervisor mysqlclient requests arrow numpy==1.26.4 SQLAlchemy PyMySQL \
-    Logbook python_dateutil py_mini_racer tqdm beautifulsoup4 bokeh pandas tornado easytrader
 
 # 安装TA-Lib
 curl -SL https://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz | tar -xzC .

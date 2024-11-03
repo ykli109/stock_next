@@ -4,7 +4,7 @@
 import numpy as np
 import talib as tl
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 

@@ -9,9 +9,6 @@ from sqlalchemy.types import NVARCHAR
 from sqlalchemy import inspect
 from dotenv import load_dotenv
 
-__author__ = 'alan'
-__date__ = '2024/10/16 '
-
 # 加载 .env 文件
 load_dotenv()
 

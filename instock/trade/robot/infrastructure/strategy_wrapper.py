@@ -5,7 +5,7 @@
 import multiprocessing as mp
 from threading import Thread
 
-__author__ = 'myh '
+
 __date__ = '2023/4/10 '
 
 

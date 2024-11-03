@@ -6,7 +6,7 @@ import sys
 import logbook
 from logbook import Logger, StreamHandler, FileHandler
 
-__author__ = 'myh '
+
 __date__ = '2023/4/10 '
 
 logbook.set_datetime_format('local')

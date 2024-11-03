@@ -5,7 +5,7 @@ import logging
 import instock.core.stockfetch as stf
 from instock.lib.singleton_type import singleton_type
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 

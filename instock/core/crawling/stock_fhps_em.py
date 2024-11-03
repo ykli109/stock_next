@@ -9,7 +9,7 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
-__author__ = 'myh '
+
 __date__ = '2023/6/27 '
 
 

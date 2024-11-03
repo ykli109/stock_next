@@ -6,7 +6,7 @@ from collections import defaultdict
 from queue import Queue, Empty
 from threading import Thread
 
-__author__ = 'myh '
+
 __date__ = '2023/4/10 '
 
 

@@ -15,7 +15,7 @@ import instock.core.tablestructure as tbs
 import instock.lib.database as mdb
 import instock.core.stockfetch as stf
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 

@@ -12,7 +12,7 @@ from functools import lru_cache
 import pandas as pd
 import requests
 
-__author__ = 'myh '
+
 __date__ = '2023/6/12 '
 
 

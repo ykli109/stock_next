@@ -5,7 +5,7 @@ from abc import ABC
 import tornado.web
 import instock.core.singleton_stock_web_module_data as sswmd
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 

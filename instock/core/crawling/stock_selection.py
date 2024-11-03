@@ -5,7 +5,7 @@ import pandas as pd
 import requests
 import instock.core.tablestructure as tbs
 
-__author__ = 'myh '
+
 __date__ = '2023/5/9 '
 
 

@@ -17,7 +17,7 @@ import instock.lib.database as mdb
 from instock.core.singleton_stock import stock_hist_data
 import instock.core.pattern.pattern_recognitions as kpr
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 

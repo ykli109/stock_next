@@ -19,7 +19,7 @@ import instock.core.crawling.stock_hist_em as she
 import instock.core.crawling.stock_fund_em as sff
 import instock.core.crawling.stock_fhps_em as sfe
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 # 设置基础目录，每次加载使用。
@@ -111,7 +111,7 @@ def fetch_stock_selection():
         data = sst.stock_selection()
         if data is None or len(data.index) == 0:
             return None
-        data.columns = list(tbs.TABLE_CN_STOCK_SELECTION['columns'])
+        data.columns= list(tbs.TABLE_CN_STOCK_SELECTION['columns'])
         return data
     except Exception as e:
         logging.error(f"stockfetch.fetch_stocks_selection处理异常：{e}")

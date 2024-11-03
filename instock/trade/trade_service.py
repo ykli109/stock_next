@@ -12,7 +12,7 @@ log_filepath = os.path.join(cpath_current, 'log', 'stock_trade.log')
 from instock.trade.robot.engine.main_engine import MainEngine
 from instock.trade.robot.infrastructure.default_handler import DefaultLogHandler
 
-__author__ = 'myh '
+
 __date__ = '2023/4/10 '
 
 

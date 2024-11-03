@@ -11,7 +11,7 @@ import instock.lib.trade_time as trd
 import instock.core.singleton_stock_web_module_data as sswmd
 import instock.web.base as webBase
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 

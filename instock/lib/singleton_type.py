@@ -5,7 +5,7 @@
 from threading import RLock
 
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 

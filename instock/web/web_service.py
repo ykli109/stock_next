@@ -28,7 +28,7 @@ import instock.web.dataTableHandler as dataTableHandler
 import instock.web.dataIndicatorsHandler as dataIndicatorsHandler
 import instock.web.base as webBase
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 

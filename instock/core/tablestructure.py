@@ -15,7 +15,7 @@ from instock.core.strategy import low_backtrace_increase
 from instock.core.strategy import keep_increasing
 from instock.core.strategy import high_tight_flag
 
-__author__ = 'myh '
+
 __date__ = '2023/3/10 '
 
 RATE_FIELDS_COUNT = 100  # N日收益率字段数目，即N值

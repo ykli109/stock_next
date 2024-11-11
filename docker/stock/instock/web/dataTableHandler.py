@@ -48,6 +48,9 @@ class GetStockDataHandler(webBase.BaseHandler, ABC):
         date = self.get_argument("date", default=None, strip=False)
         web_module_data = sswmd.stock_web_module_data().get_data(name)
         self.set_header('Content-Type', 'application/json;charset=UTF-8')
+        self.set_header('Access-Control-Allow-Origin', '*')  # 允许跨域请求
+        self.set_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')  # 允许的请求方法
+        self.set_header('Access-Control-Allow-Headers', 'Content-Type')  # 允许的请求头
         if date is None:
             where = ""
         else:

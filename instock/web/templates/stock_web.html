@@ -139,47 +139,194 @@
       return new Date(epoch.getTime() + dateValue * 24 * 60 * 60 * 1000); // 转换为JavaScript日期
   }
 
+  // IndexedDB 工具类
+  const dbUtils = {
+    DB_NAME: 'stockDB',
+    STORE_NAME: 'stockData',
+    DB_VERSION: 1,
+    
+    // 打开数据库
+    openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+            
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(this.STORE_NAME)) {
+                    // 创建对象存储空间，使用复合键 [name, date] 作为索引
+                    const store = db.createObjectStore(this.STORE_NAME, { keyPath: ['name', 'date'] });
+                    // 添加时间戳索引用于清理过期数据
+                    store.createIndex('timestamp', 'timestamp', { unique: false });
+                }
+            };
+        });
+    },
+    
+    // 存储数据
+    async set(name, date, data) {
+        try {
+            const db = await this.openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(this.STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(this.STORE_NAME);
+                
+                const item = {
+                    name,
+                    date,
+                    data,
+                    timestamp: Date.now()
+                };
+                
+                const request = store.put(item);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+            });
+        } catch (error) {
+            console.error('存储数据失败:', error);
+            throw error;
+        }
+    },
+    
+    // 获取数据
+    async get(name, date) {
+        try {
+            const db = await this.openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(this.STORE_NAME, 'readonly');
+                const store = transaction.objectStore(this.STORE_NAME);
+                
+                const request = store.get([name, date]);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    const result = request.result;
+                    if (!result) {
+                        resolve(null);
+                        return;
+                    }
+                    
+                    // 检查数据是否过期（30天）
+                    if (Date.now() - result.timestamp > 30 * 24 * 60 * 60 * 1000) {
+                        this.delete(name, date);
+                        resolve(null);
+                        return;
+                    }
+                    
+                    resolve(result.data);
+                };
+            });
+        } catch (error) {
+            console.error('获取数据失败:', error);
+            return null;
+        }
+    },
+    
+    // 删除数据
+    async delete(name, date) {
+        try {
+            const db = await this.openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(this.STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(this.STORE_NAME);
+                
+                const request = store.delete([name, date]);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve();
+            });
+        } catch (error) {
+            console.error('删除数据失败:', error);
+        }
+    },
+    
+    // 清理过期数据
+    async clearExpired() {
+        try {
+            const db = await this.openDB();
+            const transaction = db.transaction(this.STORE_NAME, 'readwrite');
+            const store = transaction.objectStore(this.STORE_NAME);
+            const index = store.index('timestamp');
+            
+            const expired = Date.now() - (30 * 24 * 60 * 60 * 1000); // 30天前
+            const range = IDBKeyRange.upperBound(expired);
+            
+            index.openCursor(range).onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    store.delete(cursor.primaryKey);
+                    cursor.continue();
+                }
+            };
+        } catch (error) {
+            console.error('清理过期数据失败:', error);
+        }
+    }
+  };
+
   // 修改 loadData 函数
-  function loadData() {
+  async function loadData() {
     const dateParam_old = document.getElementById("dateid_old").value;
     dateParam = document.getElementById('dateid').value;
     if (dateParam_old === dateParam) return;
     
     document.getElementById("dateid_old").value = dateParam;
     
-    if (gridApi) {
-        gridApi.showLoadingOverlay(); // 显示加载状态
-    }
-    
-    fetch(`/instock/api_data?name=${nameParam}&date=${dateParam}`)
-        .then(response => response.json())
-        .then(data => {
-            // 处理数据中的OADate格式
-            const processedData = data.map(item => {
-                for (const key in item) {
-                    if (item[key] && typeof item[key] === 'string' && item[key].startsWith('/OADate(')) {
-                        item[key] = convertOADate(item[key]); // 转换日期
-                    }
-                }
-                return item;
-            });
-
+    try {
+        // 尝试从 IndexedDB 获取缓存数据
+        const cachedData = await dbUtils.get(nameParam, dateParam);
+        if (cachedData) {
+            console.log('从 IndexedDB 加载数据');
             if (gridApi) {
-                console.log('data', data[0]);
-                gridApi.hideOverlay(); // 隐藏加载状态
-                gridApi.setGridOption('rowData', data);
+                gridApi.setGridOption('rowData', cachedData);
                 updateStatusBar();
             } else {
-                pendingData = data;
+                pendingData = cachedData;
             }
-        })
-        .catch(error => {
-            console.error('Error loading data:', error);
-            if (gridApi) {
-                gridApi.hideOverlay(); // 发生错误时也要隐藏加载状态
+            return;
+        }
+        
+        if (gridApi) {
+            gridApi.showLoadingOverlay();
+        }
+        
+        // 从服务器获取数据
+        const response = await fetch(`/instock/api_data?name=${nameParam}&date=${dateParam}`);
+        const data = await response.json();
+        
+        // 处理数据
+        const processedData = data.map(item => {
+            for (const key in item) {
+                if (item[key] && typeof item[key] === 'string' && item[key].startsWith('/OADate(')) {
+                    item[key] = convertOADate(item[key]);
+                }
             }
+            return item;
         });
+        
+        // 存储到 IndexedDB
+        await dbUtils.set(nameParam, dateParam, processedData);
+        
+        if (gridApi) {
+            gridApi.hideOverlay();
+            gridApi.setGridOption('rowData', processedData);
+            updateStatusBar();
+        } else {
+            pendingData = processedData;
+        }
+        
+    } catch (error) {
+        console.error('加载数据失败:', error);
+        if (gridApi) {
+            gridApi.hideOverlay();
+        }
+    }
   }
+
+  // 页面加载时清理过期数据
+  document.addEventListener('DOMContentLoaded', () => {
+    dbUtils.clearExpired().catch(console.error);
+  });
 
   // 修改 updateStatusBar 函数
   function updateStatusBar() {

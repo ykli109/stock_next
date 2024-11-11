@@ -33,12 +33,19 @@ TAG2=latest
 # 输出构建 Docker 镜像的命令
 echo " docker build -f Dockerfile -t ${DOCKER_NAME} ."
 
+# 登录阿里云镜像仓库
+# docker login --username=endless_road109 crpi-92qbf85cobo30phq.cn-shanghai.personal.cr.aliyuncs.com
+# 构建 Docker 镜像，并打上两个标签
+# docker build -t crpi-92qbf85cobo30phq.cn-shanghai.personal.cr.aliyuncs.com/${DOCKER_NAME}:${TAG1}  -t crpi-92qbf85cobo30phq.cn-shanghai.personal.cr.aliyuncs.com/${DOCKER_NAME}:${TAG2} .
+# 推送 Docker 镜像到阿里云镜像仓库
+# docker push crpi-92qbf85cobo30phq.cn-shanghai.personal.cr.aliyuncs.com/${DOCKER_NAME}:${TAG1}
+# docker push crpi-92qbf85cobo30phq.cn-shanghai.personal.cr.aliyuncs.com/${DOCKER_NAME}:${TAG2}
+
+
+# 登录 Docker Hub
+docker login --username=ykli109 
 # 构建 Docker 镜像，使用 Dockerfile，并打上两个标签
 docker build -f Dockerfile -t ${DOCKER_NAME}:${TAG1} -t ${DOCKER_NAME}:${TAG2} .
-
-# 输出分隔线
-echo "#################################################################"
-
 # 输出推送 Docker 镜像的命令
 echo " docker push ${DOCKER_NAME} "
 

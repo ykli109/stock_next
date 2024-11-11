@@ -1,11 +1,9 @@
 #!/usr/local/bin/python3
 # -*- coding: utf-8 -*-
 
-
 import json
 from abc import ABC
 from tornado import gen
-# import logging
 import datetime
 import instock.lib.trade_time as trd
 import instock.core.singleton_stock_web_module_data as sswmd

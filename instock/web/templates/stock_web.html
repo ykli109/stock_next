@@ -207,8 +207,8 @@
                         return;
                     }
                     
-                    // 检查数据是否过期（30天）
-                    if (Date.now() - result.timestamp > 30 * 24 * 60 * 60 * 1000) {
+                    // 检查数据是否过期（1天）
+                    if (Date.now() - result.timestamp > 24 * 60 * 60 * 1000) {
                         this.delete(name, date);
                         resolve(null);
                         return;

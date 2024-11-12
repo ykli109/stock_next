@@ -61,11 +61,15 @@ class Application(tornado.web.Application):
 
 # 首页handler。
 class HomeHandler(webBase.BaseHandler, ABC):
+    # @gen.coroutine
+    # def get(self):
+    #     self.render("index.html",
+    #                 stockVersion=version.__version__,
+    #                 leftMenu=webBase.GetLeftMenu(self.request.uri))
     @gen.coroutine
     def get(self):
-        self.render("index.html",
-                    stockVersion=version.__version__,
-                    leftMenu=webBase.GetLeftMenu(self.request.uri))
+        # 重定向到股票筛选页面
+        self.redirect("/instock/data?table_name=cn_stock_selection")
 
 
 def main():

@@ -23,8 +23,9 @@
     </div>
   </div>
   <div id="myGrid" class="ag-theme-alpine" style="width: 100%; height: calc(100% - 55px)"></div>
-  <div id="statusBar" style="width: 100%; height: 20px">
+  <div id="statusBar" style="width: 100%; height: 20px; margin-left: 20px">
     总记录/筛选记录：<b id="totalRows">0</b> / <b id="filteredRows">0</b> 条 - 当前位置：第 <b id="currentRow">0</b> 行
+    <a id="forceRefresh" style="float: right; margin-right: 30px; cursor: pointer; color: #d9534f;">强制刷新</a>
   </div>
 </div>
 
@@ -37,6 +38,11 @@
 
   // 添加一个变量来存储待加载的数据
   let pendingData = null;
+
+  let apiHost = '';
+  if (window.location.hostname.includes('t3techs.com')) {
+      apiHost = 'http://47.98.186.219:9988';
+  }
 
   // 配置列定义
   const columnDefs = colInfos.map(col => ({
@@ -265,25 +271,27 @@
   };
 
   // 修改 loadData 函数
-  async function loadData() {
+  async function loadData(forceUpdate = false) {
     const dateParam_old = document.getElementById("dateid_old").value;
     dateParam = document.getElementById('dateid').value;
-    if (dateParam_old === dateParam) return;
+    if (dateParam_old === dateParam && !forceUpdate) return;
     
     document.getElementById("dateid_old").value = dateParam;
     
     try {
-        // 尝试从 IndexedDB 获取缓存数据
-        const cachedData = await dbUtils.get(nameParam, dateParam);
-        if (cachedData) {
-            console.log('从 IndexedDB 加载数据');
-            if (gridApi) {
-                gridApi.setGridOption('rowData', cachedData);
-                updateStatusBar();
-            } else {
-                pendingData = cachedData;
-            }
-            return;
+        console.log('forceUpdate:', forceUpdate);
+        if (!forceUpdate) {
+          // 尝试从 IndexedDB 获取缓存数据
+          const cachedData = await dbUtils.get(nameParam, dateParam);
+          if (cachedData && cachedData.length > 0) {
+              if (gridApi) {
+                  gridApi.setGridOption('rowData', cachedData);
+                  updateStatusBar();
+              } else {
+                  pendingData = cachedData;
+              }
+              return;
+          }
         }
         
         if (gridApi) {
@@ -291,7 +299,7 @@
         }
         
         // 从服务器获取数据
-        const response = await fetch(`/instock/api_data?name=${nameParam}&date=${dateParam}`);
+        const response = await fetch(`${apiHost}/instock/api_data?name=${nameParam}&date=${dateParam}`);
         const data = await response.json();
         
         // 处理数据
@@ -369,7 +377,7 @@
       selectOtherMonths: false,
       autoclose: true,
       todayHighlight: true,
-    }).on('changeDate', loadData);
+    }).on('changeDate', () => loadData());
 
     // 重置筛选
     document.getElementById('resetFilter').onclick = () => {
@@ -380,6 +388,11 @@
 
     // 导出 Excel
     document.getElementById('exportExcel').onclick = exportToExcel;
+
+      // 添加强制刷新功能
+    document.getElementById('forceRefresh').onclick = async () => {
+      loadData(true);
+    }
   }
 </script>
 {% end %}

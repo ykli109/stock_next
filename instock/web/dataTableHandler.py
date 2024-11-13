@@ -87,16 +87,31 @@ class GetStockDataHandler(webBase.BaseHandler, ABC):
     def get(self):
         name = self.get_argument("name", default=None, strip=False)
         date = self.get_argument("date", default=None, strip=False)
+        forceUpdate = self.get_argument("forceUpdate", default=False, strip=True) == '1'
         
-        # 尝试从缓存获取数据
-        cache_key = self._get_cache_key(name, date)
-        cached_data = self._get_cached_data(cache_key)
+        # 如果 forceUpdate 为 True，则不读取缓存
+        if not forceUpdate:
+            # 尝试从缓存获取数据
+            cache_key = self._get_cache_key(name, date)
+            cached_data = self._get_cached_data(cache_key)
+        else:
+            cached_data = None  # 强制更新时不使用缓存
         
+        # 获取请求的 Origin 头
+        origin = self.request.headers.get("Origin")
+
+
+        # 检查请求的 Origin 是否是允许的域名或其子域名
+        if origin and (origin.endswith("t3techs.com")):
+            self.set_header('Access-Control-Allow-Origin', origin)  # 允许的来源
+        else:
+            self.set_header('Access-Control-Allow-Origin', 'null')  # 不允许的来源
+
+        self.set_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.set_header('Access-Control-Allow-Headers', 'Content-Type')
+
         if cached_data is not None:
             self.set_header('Content-Type', 'application/json;charset=UTF-8')
-            self.set_header('Access-Control-Allow-Origin', '*')
-            self.set_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-            self.set_header('Access-Control-Allow-Headers', 'Content-Type')
             self.write(json.dumps(cached_data, cls=MyEncoder))
             print(f"缓存命中: {cache_key}")
             return
@@ -105,9 +120,6 @@ class GetStockDataHandler(webBase.BaseHandler, ABC):
         print(f"缓存未命中: {cache_key}")
         web_module_data = sswmd.stock_web_module_data().get_data(name)
         self.set_header('Content-Type', 'application/json;charset=UTF-8')
-        self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.set_header('Access-Control-Allow-Headers', 'Content-Type')
 
         if date is None:
             where = ""

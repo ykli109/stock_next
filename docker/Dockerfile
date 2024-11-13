@@ -25,5 +25,6 @@ COPY install.sh /tmp/install.sh
 RUN chmod +x /tmp/install.sh && /tmp/install.sh && \
     rm -f /tmp/install.sh
 
+RUN chmod +x /data/InStock/instock/bin/*.sh
 # 设置容器启动时执行的命令
 ENTRYPOINT ["supervisord","-n","-c","/data/InStock/supervisor/supervisord.conf"]

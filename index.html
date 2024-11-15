@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Alan的个人主页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* 基本样式 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            scroll-behavior: smooth;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .container {
+            padding: 150px 20px 60px; /* 上边距为固定头部高度 */
+            max-width: 1200px;
+            margin: auto;
+        }
+        section {
+            margin-bottom: 60px;
+            position: relative; /* 使得padding-top生效 */
+            scroll-margin-top: 150px; /* 设置滚动时的上边距，避免被导航栏遮挡 */
+        }
+        h2 {
+            color: #4CAF50;
+            border-bottom: 2px solid #4CAF50;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        /* 导航菜单 */
+        nav {
+            margin-top: 10px;
+        }
+        nav a {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        /* 技能栏 */
+        .skills .skill {
+            margin-bottom: 15px;
+        }
+        .skills .skill .skill-name {
+            margin-bottom: 5px;
+        }
+        .skills .skill .skill-bar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+        }
+        .skills .skill .skill-bar::after {
+            content: "";
+            display: block;
+            height: 20px;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            width: 0;
+            transition: width 1s;
+        }
+        /* 项目展示 */
+        .projects .project {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .projects .project img {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+        }
+        .projects .project .project-info {
+            padding: 20px;
+            flex: 1;
+        }
+        .projects .project .project-info h3 {
+            margin-top: 0;
+        }
+        .projects .project .project-info p {
+            line-height: 1.6;
+        }
+        .projects .project .project-info a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .projects .project .project-info a:hover {
+            background-color: #45a049;
+        }
+        /* 联系表单 */
+        .contact form {
+            display: flex;
+            flex-direction: column;
+        }
+        .contact form input, 
+        .contact form textarea {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+        }
+        .contact form button {
+            padding: 10px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .contact form button:hover {
+            background-color: #45a049;
+        }
+        /* 页脚 */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .projects .project {
+                flex-direction: column;
+            }
+            nav a {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+        /* 动画 */
+        .skills .skill .skill-bar::after {
+            width: 0;
+        }
+        .skills .skill.loaded .skill-bar::after {
+            width: var(--skill-level);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Alan的个人主页</h1>
+        <nav>
+            <a href="#about">关于我</a>
+            <a href="#skills">技能</a>
+            <a href="#projects">项目</a>
+            <a href="#contact">联系我</a>
+        </nav>
+    </header>
+    <div class="container">
+        <section id="about">
+            <h2>关于我</h2>
+            <p>你好，我是Alan，一名热爱编程和技术的开发者。目前专注于Web开发和软件工程。我热衷于学习新技术，解决复杂的问题，并创建有用的应用程序。</p>
+        </section>
+        <section id="skills" class="skills">
+            <h2>技能</h2>
+            <div class="skill" style="--skill-level: 90%;">
+                <div class="skill-name">HTML/CSS</div>
+                <div class="skill-bar"></div>
+            </div>
+            <div class="skill" style="--skill-level: 85%;">
+                <div class="skill-name">JavaScript</div>
+                <div class="skill-bar"></div>
+            </div>
+            <div class="skill" style="--skill-level: 80%;">
+                <div class="skill-name">Python</div>
+                <div class="skill-bar"></div>
+            </div>
+            <div class="skill" style="--skill-level: 75%;">
+                <div class="skill-name">React</div>
+                <div class="skill-bar"></div>
+            </div>
+            <div class="skill" style="--skill-level: 70%;">
+                <div class="skill-name">Node.js</div>
+                <div class="skill-bar"></div>
+            </div>
+        </section>
+        <section id="projects" class="projects">
+            <h2>项目经验</h2>
+            <div class="project">
+                <img src="https://via.placeholder.com/300" alt="项目一图片">
+                <div class="project-info">
+                    <h3>项目一：个人博客系统</h3>
+                    <p>使用Python和Django框架开发的个人博客系统，实现了文章发布、评论和用户管理等功能。</p>
+                    <a href="#">查看详情</a>
+                </div>
+            </div>
+            <div class="project">
+                <img src="https://via.placeholder.com/300" alt="项目二图片">
+                <div class="project-info">
+                    <h3>项目二：在线商城网站</h3>
+                    <p>基于React和Node.js开发的在线商城网站，支持用户注册、商品浏览和购物车功能。</p>
+                    <a href="#">查看详情</a>
+                </div>
+            </div>
+        </section>
+        <section id="contact" class="contact">
+            <h2>联系我</h2>
+            <form id="contactForm">
+                <input type="text" id="name" name="name" placeholder="您的姓名" required>
+                <input type="email" id="email" name="email" placeholder="您的邮箱" required>
+                <textarea id="message" name="message" rows="5" placeholder="您的留言" required></textarea>
+                <button type="submit">发送</button>
+            </form>
+            <div id="formMessage" style="margin-top: 15px; display: none;"></div>
+        </section>
+    </div>
+    <footer>
+        ICP备案号：京ICP备12345678号-1 | 版权所有 © 2024 Alan
+    </footer>
+    <script>
+        // 动态加载技能栏动画
+        window.addEventListener('scroll', () => {
+            const skillsSection = document.querySelector('.skills');
+            const skillsOffsetTop = skillsSection.offsetTop;
+            const skillsHeight = skillsSection.offsetHeight;
+            const windowHeight = window.innerHeight;
+            const scrollY = window.scrollY;
+
+            if (scrollY + windowHeight > skillsOffsetTop + 100) {
+                const skillElements = document.querySelectorAll('.skills .skill');
+                skillElements.forEach(skill => {
+                    skill.classList.add('loaded');
+                });
+            }
+        });
+
+        // 联系表单提交处理
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formMessage = document.getElementById('formMessage');
+            formMessage.style.display = 'block';
+            formMessage.style.color = 'green';
+            formMessage.textContent = '您的留言已发送成功！谢谢！';
+
+            // 清空表单
+            this.reset();
+
+            // 隐藏消息
+            setTimeout(() => {
+                formMessage.style.display = 'none';
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

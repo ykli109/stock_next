@@ -2,24 +2,33 @@
 <link rel="stylesheet" href="/static/css/bootstrap-datepicker3.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
+<!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
 <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/static/js/ag-grid-zh-cn.js"></script>
+<!-- <script src="/static/js/ag-grid-filter.js"></script> -->
 <script src="/static/js/bootstrap-datepicker.min.js"></script>
 <script src="/static/js/bootstrap-datepicker.zh-CN.min.js"></script>
 
+<!-- 筛选按钮 -->
 <div style="height: 100%; overflow: hidden">
   <div class="table-header" style="width: 100%; height: 35px">
-    <div style="display: inline-block; float: left; height: 100%">
-      <div style="display: inline-block; float: left; text-overflow: ellipsis; white-space: nowrap;">
+    <div style="float: left; height: 100%">
+      <div style="float: left; text-overflow: ellipsis; white-space: nowrap;">
         {{ web_module_data.name }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;日期：
       </div>
-      <div style="display: inline-block; float: right">
+      <div style="float: right">
         <input type="hidden" id="dateid_old" />
         <input type="text" value="{{ date_now }}" id="dateid" class="input-group-sm form-control date-picker" />
       </div>
     </div>
-    <div style="display: inline-block; float: right; height: 100%">
-      <input type="button" id="resetFilter" value="重置筛选" style="background-color: #307ecc; height: 100%" />
-      <input type="button" id="exportExcel" value="导出Excel" style="background-color: #307ecc; height: 100%" />
+    <div style="float: right; height: 100%; margin-right: 10px;">
+      <!-- <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#filterModal">
+        高级筛选
+      </button> -->
+      <input type="button" id="resetFilter" value="重置筛选" class="btn btn-secondary btn-sm ml-2" />
+      <input type="button" id="exportExcel" value="导出Excel" class="btn btn-success btn-sm ml-2" />
     </div>
   </div>
   <div id="myGrid" class="ag-theme-alpine" style="width: 100%; height: calc(100% - 55px)"></div>
@@ -28,6 +37,30 @@
     <a id="forceRefresh" style="float: right; margin-right: 30px; cursor: pointer; color: #d9534f;">强制刷新</a>
   </div>
 </div>
+
+<!-- 筛选模态 -->
+<!-- <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="filterModalLabel">高级筛选</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="关闭">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="filterForm">
+          <div id="filterFields">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="applyFilters">应用筛选</button>
+      </div>
+    </div>
+  </div>
+</div> -->
 
 <script type="text/javascript">
   const nameParam = new URLSearchParams(window.location.search).get('table_name');
@@ -41,7 +74,7 @@
 
   let apiHost = '';
   if (window.location.hostname.includes('t3techs.com')) {
-      apiHost = 'http://47.98.186.219:9988';
+      apiHost = 'https://api.t3techs.asia';
   }
 
   // 配置列定义
@@ -96,7 +129,7 @@
     window.addEventListener('resize', () => {
         setTimeout(() => {
             params.api.sizeColumnsToFit();
-        });
+        }, 100);
     });
   }
 
@@ -121,7 +154,8 @@
       onRowSelected: updateStatusBar,
       pagination: true,
       paginationPageSize: 100,
-      enableCellTextSelection: true
+      enableCellTextSelection: true,
+      localeText: AG_GRID_LOCALE_CN // 确保已加载中文语言包
     };
 
     // 使用新的 createGrid API
@@ -328,6 +362,8 @@
         if (gridApi) {
             gridApi.hideOverlay();
         }
+    } finally {
+      // setTimeout(() => generateFilterFields(), 400);
     }
   }
 
@@ -380,11 +416,15 @@
     }).on('changeDate', () => loadData());
 
     // 重置筛选
-    document.getElementById('resetFilter').onclick = () => {
-      if (gridApi && gridApi.api) {
-        gridApi.api.setFilterModel(null);
-      }
-    };
+    // document.getElementById('resetFilter').onclick = () => {
+    //   if (gridApi && gridApi.api) {
+    //     gridApi.api.setFilterModel(null);
+    //     gridApi.api.onFilterChanged();
+    //   }
+    // };
+
+    // 应用筛选按钮点击事件
+    // document.getElementById('applyFilters').onclick = applyFilters;
 
     // 导出 Excel
     document.getElementById('exportExcel').onclick = exportToExcel;

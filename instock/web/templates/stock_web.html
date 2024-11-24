@@ -13,7 +13,7 @@
 
 <!-- 筛选按钮 -->
 <div style="height: 100%; overflow: hidden">
-  <div class="table-header" style="width: 100%; height: 35px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+  <div class="table-header" style="width: 100%; height: 35px; display: flex; justify-content: flex-start; align-items: center; gap: 10px;">
     <!-- 左侧日期选择区域 -->
     <div style="display: flex; align-items: center; min-width: 0;">
       <div style="white-space: nowrap; margin-right: 10px;">
@@ -25,8 +25,13 @@
       </div>
     </div>
 
+    <!-- 添加列设置按钮 -->
+    <div style="display: flex; gap: 8px;">
+      <div id="columnSettings" style="margin-left: 30px; height: 30px; padding: 0 40px; font-size: 14px; cursor: pointer; background-color: #2da7af; border: 1px solid #2da7af; border-radius: 4px; display: flex; align-items: center;">列设置</div>
+    </div>
+
     <!-- 中间二维码按钮 -->
-    <div style="display: flex; gap: 8px; line-height: 30px; margin-right: 10px;">
+    <div style="display: flex; gap: 8px; line-height: 30px; margin-left: auto; margin-right: 10px;">
       <div id="showUserGroupQR" style="height: 30px; padding: 0 10px; font-size: 14px; cursor: pointer; background-color: #ccaddc; border: 1px solid #ccaddc; border-radius: 4px; display: flex; align-items: center;">加入用户群</div>
       <div id="showAdminQR" style="height: 30px; padding: 0 10px; font-size: 14px; cursor: pointer; background-color: #daad3d; border: 1px solid #daad3d; border-radius: 4px; display: flex; align-items: center;">添加管理员</div>
     </div>
@@ -80,6 +85,20 @@
   .gap-2 {
     gap: 0.5rem;
   }
+
+  /* 列设置弹窗样式 */
+  .form-check {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .form-check:last-child {
+    border-bottom: none;
+  }
+
+  .form-check-input {
+    margin-right: 8px;
+  }
 </style>
 
 <!-- 二维码模态框 -->
@@ -97,6 +116,32 @@
         <div style="position: fixed; width: 10px; height: 10px; left: -100px;top:-100px; opacity: 0;">
           <img id="qrImage" src="https://t3techs.asia/group.png" alt="二维码" style="width: 100%; height: auto; display: block;" />
           <img id="qrImage" src="https://t3techs.asia/group.png" alt="二维码" style="width: 100%; height: auto; display: block;" />
+        </div>
+    </div>
+</div>
+
+<!-- 修改列设置弹窗的 HTML -->
+<div id="columnSettingsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: relative; width: 90%; max-width: 500px; margin: 50px auto; background-color: white; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <!-- 模态框头部 -->
+        <div style="padding: 15px; border-bottom: 1px solid #e5e5e5; display: flex; justify-content: space-between; align-items: center;">
+            <h5 style="margin: 0; font-size: 18px;">列显示设置</h5>
+            <span style="cursor: pointer; font-size: 24px;" onclick="document.getElementById('columnSettingsModal').style.display='none'">&times;</span>
+        </div>
+        <!-- 模态框内容 -->
+        <div id="columnList" style="padding: 15px; max-height: 400px; overflow-y: auto; display: flex; flex-wrap: wrap;">
+            <!-- 列选项将通过 JavaScript 动态生成 -->
+        </div>
+        <!-- 模态框底部 -->
+        <div style="padding: 15px; border-top: 1px solid #e5e5e5; text-align: right;">
+            <button onclick="document.getElementById('columnSettingsModal').style.display='none'" 
+                    style="margin-right: 10px; padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; background: #f8f9fa; cursor: pointer;">
+                关闭
+            </button>
+            <button id="saveColumnSettings" 
+                    style="padding: 6px 12px; border: 1px solid #007bff; border-radius: 4px; background: #007bff; color: white; cursor: pointer;">
+                保存
+            </button>
         </div>
     </div>
 </div>
@@ -120,6 +165,7 @@
   }
 
   // 配置列定义
+  const columnState = JSON.parse(localStorage.getItem('gridColumnState')) || {};
   const columnDefs = colInfos.map(col => ({
     field: col.value,
     headerName: col.caption,
@@ -135,7 +181,8 @@
         if (params.value < 0) return { color: 'green' };
       }
       return null;
-    }
+    },
+    hide: columnState[col.value] === false // 根据本地存储的状态设置列的可见性
   }));
   // 创建超链接渲染器
   function createHyperlink(params) {
@@ -206,19 +253,103 @@
     return gridApi;
   }
 
+  // 添加列设置相关函数
+  function initColumnSettings() {
+    // 打开列设置弹窗
+    document.getElementById('columnSettings').onclick = () => {
+        const columnList = document.getElementById('columnList');
+        columnList.innerHTML = '';
+
+        // 获取当前列状态
+        const columns = gridApi.getColumns();
+        console.log(columns);
+        
+        // 生成列选项
+        columns.forEach(column => {
+            const div = document.createElement('div');
+            div.style.cssText = 'padding: 8px; display: flex; align-items: center;';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `col_${column.getId()}`;
+            checkbox.checked = column.isVisible();
+            checkbox.style.cssText = 'margin-right: 8px;';
+            
+            const label = document.createElement('label');
+            label.htmlFor = `col_${column.getId()}`;
+            label.textContent = column.getColDef().headerName;
+            label.style.cssText = 'margin: 0; cursor: pointer;';
+            
+            div.appendChild(checkbox);
+            div.appendChild(label);
+            columnList.appendChild(div);
+        });
+
+        // 显示弹窗
+        document.getElementById('columnSettingsModal').style.display = 'block';
+    };
+
+    // 保存列设置
+    document.getElementById('saveColumnSettings').onclick = () => {
+        const columns = gridApi.getColumns();
+        const columnState = {};
+
+        columns.forEach(column => {
+            const checkbox = document.getElementById(`col_${column.getId()}`);
+            const isVisible = checkbox.checked;
+            columnState[column.getColId()] = isVisible;
+        });
+
+        const visibleColumns = [];
+        const hiddenColumns = [];
+
+        for (const [colId, isVisible] of Object.entries(columnState)) {
+            if (isVisible) {
+                visibleColumns.push(colId);
+            } else {
+                hiddenColumns.push(colId);
+            }
+        }
+
+        gridApi.setColumnsVisible(visibleColumns, true);
+        gridApi.setColumnsVisible(hiddenColumns, false);
+
+        // 保存到 localStorage
+        localStorage.setItem('gridColumnState', JSON.stringify(columnState));
+        
+        // 关闭弹窗
+        document.getElementById('columnSettingsModal').style.display = 'none';
+        
+        // 调整列大小以适应内容
+        gridApi.sizeColumnsToFit();
+    };
+
+    // 点击模态框背景关闭
+    document.getElementById('columnSettingsModal').onclick = function(event) {
+        if (event.target === this) {
+            this.style.display = 'none';
+        }
+    };
+  }
+
   // 修改初始化调用
   $(document).ready(() => {
     gridApi = initGrid();  // 保存返回的 gridApi
     initEvents();
     loadData();
+    initColumnSettings();
   });
 
   // 添加一个函数来处理OADate格式
   function convertOADate(oaDate) {
-      const dateValue = parseFloat(oaDate.match(/OADate\(([^)]+)\)/)[1]);
-      const epoch = new Date(1899, 11, 30); // OADate的起始日期
-      return new Date(epoch.getTime() + dateValue * 24 * 60 * 60 * 1000); // 转换为JavaScript日期
-  }
+    const dateValue = parseFloat(oaDate.match(/OADate\(([^)]+)\)/)[1]);
+    const epoch = new Date(1899, 11, 30); // OADate的起始日期
+    const utcDate = new Date(epoch.getTime() + dateValue * 24 * 60 * 60 * 1000); // 转换为UTC日期
+
+    // 调整为 +8 小时
+    const timezoneOffset = 8 * 60 * 60 * 1000; // +8 小时的毫秒数
+    return new Date(utcDate.getTime() + timezoneOffset); // 返回调整后的日期
+}
 
   // IndexedDB 工具类
   const dbUtils = {

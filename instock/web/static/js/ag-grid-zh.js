@@ -139,9 +139,9 @@ var AG_GRID_LOCALE_CN = {
     rowDragRows: '行',
 
     // Other
-    loadingOoo: '加载中...',
-    loadingError: '错误',
-    noRowsToShow: '无显示行',
+    loadingOoo: '数据正在加载中，请稍后...',
+    loadingError: '数据加载错误，请刷新页面重试',
+    noRowsToShow: '1. 当天数据还未更新或已丢失 \n2. 当前策略下没有数据',
     enabled: '启用',
 
     // Menu

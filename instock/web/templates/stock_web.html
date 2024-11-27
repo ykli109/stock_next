@@ -124,11 +124,20 @@
 <div id="columnSettingsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
     <div style="position: relative; width: 90%; max-width: 500px; margin: 50px auto; background-color: white; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
         <!-- 模态框头部 -->
-        <div style="padding: 15px; border-bottom: 1px solid #e5e5e5; display: flex; justify-content: space-between; align-items: center;">
+        <div style="padding: 15px; border-bottom: 1px solid #e5e5e5; display: flex; justify-content: flex-start; align-items: center;">
             <h5 style="margin: 0; font-size: 18px;">列显示设置</h5>
-            <span style="cursor: pointer; font-size: 24px;" onclick="document.getElementById('columnSettingsModal').style.display='none'">&times;</span>
+            <!-- 添加全选/取消全选按钮 -->
+            <button id="selectAllColumns" 
+                    style="margin-left: 20px; margin-right: 10px; padding: 4px 8px; border: 1px solid #28a745; border-radius: 4px; background: #28a745; color: white; cursor: pointer;">
+                全选
+            </button>
+            <button id="deselectAllColumns" 
+                    style="padding: 4px 8px; border: 1px solid #dc3545; border-radius: 4px; background: #dc3545; color: white; cursor: pointer;">
+                取消全选
+            </button>
+            <span style="margin-left: auto; cursor: pointer; font-size: 24px;" onclick="document.getElementById('columnSettingsModal').style.display='none'">&times;</span>
         </div>
-        <!-- 模态框内容 -->
+        <!-- 列选项列表 -->
         <div id="columnList" style="padding: 15px; max-height: 400px; overflow-y: auto; display: flex; flex-wrap: wrap;">
             <!-- 列选项将通过 JavaScript 动态生成 -->
         </div>
@@ -171,6 +180,28 @@
     headerName: col.caption,
     sortable: true,
     filter: true,
+    ...(col.value === 'name' ? {
+      filterParams: {
+        // 直接添加自定义选项
+        filterOptions: [
+            'contains', // 默认选项
+            'notContains', // 默认选项
+            'equals', // 默认选项
+            'notEqual', // 默认选项
+            'startsWith',
+            'endsWith',
+            {
+                displayKey: 'customOption', // 自定义选项的键
+                displayName: '包含(多个，以逗号分隔)', // 自定义选项的显示名称
+                predicate: ([filterText], cellValue) => {
+                    // 自定义筛选逻辑
+                    const filterTexts = filterText.split(/[,，]/).map(text => text.trim()); // 按逗号分隔并去除空格
+                    return filterTexts.some(text => cellValue && cellValue.includes(text)); // 检查是否以任一项开头
+                }
+            }
+        ]
+      }
+    } : {}),
     pinned: ['date', 'code', 'name'].includes(col.value) ? 'left' : null,
     cellRenderer: col.value === 'code' ? createHyperlink : null,
     cellStyle: params => {
@@ -329,6 +360,22 @@
         if (event.target === this) {
             this.style.display = 'none';
         }
+    };
+
+    // 添加全选功能
+    document.getElementById('selectAllColumns').onclick = () => {
+        const checkboxes = document.querySelectorAll('#columnList input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+    };
+
+    // 添加取消全选功能
+    document.getElementById('deselectAllColumns').onclick = () => {
+        const checkboxes = document.querySelectorAll('#columnList input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
     };
   }
 
@@ -504,7 +551,7 @@
             gridApi.showLoadingOverlay();
         }
         
-        // 从服务器获取数据
+        // 从服务器获��数据
         const response = await fetch(`${apiHost}/instock/api_data?name=${nameParam}&date=${dateParam}`);
         const data = await response.json();
         

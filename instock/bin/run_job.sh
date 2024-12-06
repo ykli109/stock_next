@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 instock_path=$(dirname "$(realpath "$0")")/..
 

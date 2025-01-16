@@ -37,7 +37,7 @@ def save_nph_stock_selection_data(date, before=True):
             cols_type = None
         else:
             cols_type = tbs.get_field_types(tbs.TABLE_CN_STOCK_SELECTION['columns'])
-
+        logging.info(f"数据长度: {len(data)}")
         mdb.insert_db_from_df(data, table_name, cols_type, False, "`date`,`code`")
     except Exception as e:
         logging.error(f"selection_data_daily_job.save_nph_stock_selection_data处理异常：{e}")

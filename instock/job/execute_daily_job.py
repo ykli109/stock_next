@@ -56,7 +56,7 @@ def main():
     bdj.main()
 
     # # # # 第7步创建股票闭盘后才有的数据
-    acdj.main()
+    acdj.main() # 股票大宗交易
 
     logging.info("######## 完成任务, 使用时间: %s 秒 #######" % (time.time() - start))
 
